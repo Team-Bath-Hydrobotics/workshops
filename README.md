@@ -1,2 +1,44 @@
 # workshops
 A repo for code related to any workshops we run.
+
+
+
+objp = np.zeros((CHECKERBOARD[0]*CHECKERBOARD[1], 3), np.float32)
+objp[:, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
+objp *= SQUARE_SIZE
+
+objpoints = []
+imgpoints = []
+
+images = glob.glob(IMAGE_PATH)
+
+for fname in images:
+    print("Processing:", fname)
+    img = cv2.imread(fname)
+    if img is None:
+        print(f"Could not read image: {fname}")
+        continue
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    ret, corners = cv2.findChessboardCornersSB(gray, CHECKERBOARD, None)
+
+    if ret:
+        objpoints.append(objp)
+        imgpoints.append(corners)
+    else:
+        print(f"Could not find checkerboard corners")
+
+ret, camera_matrix, dist_coeffs, _, _ = cv2.calibrateCamera(
+    objpoints, imgpoints, gray.shape[::-1], None, None
+)
+
+
+
+Camera matrix:
+ [[4.43916885e+03 0.00000000e+00 2.14415454e+03]
+ [0.00000000e+00 4.43867388e+03 2.85312508e+03]
+ [0.00000000e+00 0.00000000e+00 1.00000000e+00]]
+Distortion coeffs:
+ [[ 2.88829927e-01 -1.85731708e+00 -8.70417653e-04 -5.28261999e-04
+   3.49679774e+00]]
+fx=4439.2, fy=4438.7, cx=2144.2, cy=2853.1
