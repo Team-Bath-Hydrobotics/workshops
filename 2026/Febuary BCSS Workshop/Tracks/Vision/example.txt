@@ -36,3 +36,13 @@ Distortion coeffs:
  [[ 2.88829927e-01 -1.85731708e+00 -8.70417653e-04 -5.28261999e-04
    3.49679774e+00]]
 fx=4439.2, fy=4438.7, cx=2144.2, cy=2853.1
+
+
+######
+CHECKERBOARD = (9, 6)      # inner corners, do not change
+SQUARE_SIZE = 2.5
+BASELINE = 6.0  # Distance between camera lenses in cm
+FOCAL_LENGTH = 0.0 # Focal length in pixels, calculated above
+
+OBJECT_REAL_WIDTH = 13.0  # Real width of object in cm
+OBJECT_REAL_HEIGHT = 20.0  # Real height of object in cm
