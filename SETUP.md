@@ -7,9 +7,25 @@ Welcome! This guide will help you get set up to run the workshop materials.
 ### Option 1: Binder (No Installation Needed)
 Run the notebooks directly in your browser without installing anything:
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/YOUR-USERNAME/Hydrobotics-Workshops/main)
+#### Object Dection AI/ML Track (Intermediate)
+[![Binder](https://mybinder.org/badge_logo.svg)](
+https://mybinder.org/v2/gh/Team-Bath-Hydrobotic/Hydrobotics-Workshops/main?labpath=2026/Febuary%20BCSS%20Worhsop/AI%2FML/object_detection_intro.ipynb
+)
+#### Depth Estimation Vision Track (Intermediate)
+[![Binder](https://mybinder.org/badge_logo.svg)](
+https://mybinder.org/v2/gh/Team-Bath-Hydrobotic/Hydrobotics-Workshops/main?labpath=2026/Febuary%20BCSS%20Worhsop/Vision/depth_estimation.ipynb
+)
+#### Vision Fundamentals Vision Track (Beginner)
+[![Binder](https://mybinder.org/badge_logo.svg)](
+https://mybinder.org/v2/gh/Team-Bath-Hydrobotic/Hydrobotics-Workshops/main?labpath=2026/Febuary%20BCSS%20Worhsop/Vision/vision_fundamentals.ipynb
+)
+#### Systems Design Track (Beginner/Intermediate)
+[![Binder](https://mybinder.org/badge_logo.svg)](
+https://mybinder.org/v2/gh/Team-Bath-Hydrobotic/Hydrobotics-Workshops/main?labpath=2026/Febuary%20BCSS%20Worhsop/Systems%20Design/architecture.ipynb
+)
 
-Click the badge above to launch the notebooks in Binder. This is the easiest option if you're unfamiliar with Git or Python.
+
+Click the badges above to launch the notebooks in Binder. This is the easiest option if you're unfamiliar with Git or Python.
 
 ---
 
@@ -54,13 +70,14 @@ Click the badge above to launch the notebooks in Binder. This is the easiest opt
    ```
    
    This will open Jupyter in your browser. Navigate to `workshops/2026/Febuary BCSS Workshop/Tracks/` to find the notebooks.
-
+   > **Note:** You are more than welcome to run the notebook locally i.e in your ide.
 ---
 
 ## What's Included
 
 ### AI Track
-- **Machine Learning**: Object detection introduction with YOLOv8
+- **Machine Learning**: Object detection introduction with YOLOv5
+- Underwater dataset for experimentation
 
 ### Vision Track
 - **Depth Estimation**: Stereo vision depth calculation
@@ -69,7 +86,7 @@ Click the badge above to launch the notebooks in Binder. This is the easiest opt
 - example.txt a file containing example solutions to cells required for the depth estimation task
 
 ### System Design Track
-- **Architecture**: System design patterns
+- **Architecture**: System design questions
 
 ---
 
@@ -139,23 +156,9 @@ which python3            # Should point to Python 3.11
 pip --version            # Should show pip X.X.X from /path/to/python3.11
 ```
 
----
-
-## For Instructors
-
-To enable Binder support:
-1. Push this repository to GitHub
-2. Update the Binder link in this file with your GitHub username and repository name
-3. Share the Binder link with participants
-
-Binder automatically builds the environment using `requirements.txt` and `runtime.txt`.
-
----
-
 ## Need Help?
 
 If you encounter issues:
 1. **Verify Python 3.11 is installed and active:** `python3 --version`
 2. Ensure you've created and activated a virtual environment with Python 3.11
 3. Reinstall dependencies: `pip install --upgrade -r requirements.txt`
-4. Check that no Python 3.13 is interfering (it will cause OpenCV crashes)
