@@ -21,7 +21,7 @@ https://mybinder.org/v2/gh/Team-Bath-Hydrobotics/workshops/HEAD?labpath=2026/Feb
 )
 #### Systems Design Track (Beginner/Intermediate)
 [![Binder](https://mybinder.org/badge_logo.svg)](
-https://mybinder.org/v2/gh/Team-Bath-Hydrobotics/workshops/HEAD?labpath=2026/Febuary%20BCSS%20Workshop/Tracks/Systems%20Design/architecture.ipynb
+https://mybinder.org/v2/gh/Team-Bath-Hydrobotics/workshops/HEAD?labpath=2026/Febuary%20BCSS%20Workshop/Tracks/System%20Design/architecture.ipynb
 )
 
 
