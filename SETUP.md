@@ -40,7 +40,7 @@ Click the badges above to launch the notebooks in Binder. This is the easiest op
 1. **Clone or download the repository**
    ```bash
    git clone https://github.com/Team-Bath-Hydrobotics/workshops.git
-   cd Hydrobotics-Workshops
+   cd workshops
    ```
 
 2. **Create a virtual environment** (recommended)
