@@ -9,19 +9,19 @@ Run the notebooks directly in your browser without installing anything:
 
 #### Object Dection AI/ML Track (Intermediate)
 [![Binder](https://mybinder.org/badge_logo.svg)](
-https://mybinder.org/v2/gh/Team-Bath-Hydrobotic/Hydrobotics-Workshops/main?labpath=2026/Febuary%20BCSS%20Worhsop/AI%2FML/object_detection_intro.ipynb
+https://mybinder.org/v2/gh/Team-Bath-Hydrobotics/workshops/HEAD?labpath=2026/Febuary%20BCSS%20Workshop/Tracks/AI%2FML/object_detection_intro.ipynb&urlpath=lab&build=1
 )
 #### Depth Estimation Vision Track (Intermediate)
 [![Binder](https://mybinder.org/badge_logo.svg)](
-https://mybinder.org/v2/gh/Team-Bath-Hydrobotic/Hydrobotics-Workshops/main?labpath=2026/Febuary%20BCSS%20Worhsop/Vision/depth_estimation.ipynb
+https://mybinder.org/v2/gh/Team-Bath-Hydrobotics/workshops/HEAD?labpath=2026/Febuary%20BCSS%20Workshop/Tracks/Vision/depth_estimation.ipynb&urlpath=lab&build=1
 )
 #### Vision Fundamentals Vision Track (Beginner)
 [![Binder](https://mybinder.org/badge_logo.svg)](
-https://mybinder.org/v2/gh/Team-Bath-Hydrobotic/Hydrobotics-Workshops/main?labpath=2026/Febuary%20BCSS%20Worhsop/Vision/vision_fundamentals.ipynb
+https://mybinder.org/v2/gh/Team-Bath-Hydrobotics/workshops/HEAD?labpath=2026/Febuary%20BCSS%20Workshop/Tracks/Vision/vision_fundamentals.ipynb&urlpath=lab&build=1
 )
 #### Systems Design Track (Beginner/Intermediate)
 [![Binder](https://mybinder.org/badge_logo.svg)](
-https://mybinder.org/v2/gh/Team-Bath-Hydrobotic/Hydrobotics-Workshops/main?labpath=2026/Febuary%20BCSS%20Worhsop/Systems%20Design/architecture.ipynb
+https://mybinder.org/v2/gh/Team-Bath-Hydrobotics/workshops/HEAD?labpath=2026/Febuary%20BCSS%20Workshop/Tracks/System%20Design/architecture.ipynb&urlpath=lab&build=1
 )
 
 
