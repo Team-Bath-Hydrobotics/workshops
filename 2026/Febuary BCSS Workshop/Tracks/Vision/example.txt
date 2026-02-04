@@ -1,3 +1,8 @@
+
+###############################################################
+File loading and camera calibration using cornersSB
+
+
 objp = np.zeros((CHECKERBOARD[0]*CHECKERBOARD[1], 3), np.float32)
 objp[:, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
 objp *= SQUARE_SIZE
@@ -27,7 +32,8 @@ ret, camera_matrix, dist_coeffs, _, _ = cv2.calibrateCamera(
     objpoints, imgpoints, gray.shape[::-1], None, None
 )
 
-
+###############################################################
+example calibration matrix 
 Camera matrix:
  [[4.43916885e+03 0.00000000e+00 2.14415454e+03]
  [0.00000000e+00 4.43867388e+03 2.85312508e+03]
@@ -37,8 +43,105 @@ Distortion coeffs:
    3.49679774e+00]]
 fx=4439.2, fy=4438.7, cx=2144.2, cy=2853.1
 
+###############################################################
+Altenrative not using SB corners, need to use Sobel or DOG to help detect edges due to computer screen aliasing
 
-######
+## TODO: Calibrate the camera using checkerboard images
+
+import cv2
+import numpy as np
+import glob
+
+# ===== USER INPUT =====
+CHECKERBOARD = (9, 6)      # inner corners
+SQUARE_SIZE = 2.5          # cm measured square size
+IMAGE_PATH = "Images/Checkerboard/*.jpg"
+# ======================
+
+objp = np.zeros((CHECKERBOARD[0]*CHECKERBOARD[1], 3), np.float32)
+objp[:, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
+objp *= SQUARE_SIZE
+
+objpoints = []
+imgpoints = []
+
+images = sorted(glob.glob(IMAGE_PATH))
+print(f"Found {len(images)} images in {IMAGE_PATH}\n")
+
+successful = 0
+failed = 0
+
+for i, fname in enumerate(images, 1):
+    print(f"[{i}/{len(images)}] {fname.split('/')[-1]:30s}", end=" ")
+    img = cv2.imread(fname)
+    if img is None:
+        print("✗ (could not read)")
+        failed += 1
+        continue
+    
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # Use Difference of Gaussians for screen-rendered checkerboards
+    blurred1 = cv2.GaussianBlur(gray, (3, 3), 0.5)
+    blurred2 = cv2.GaussianBlur(gray, (15, 15), 3)
+    dog = cv2.subtract(blurred1, blurred2)
+    dog = cv2.normalize(dog, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+    
+    ret, corners = cv2.findChessboardCorners(
+        dog,
+        CHECKERBOARD,
+        cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_NORMALIZE_IMAGE
+    )
+
+    if ret and corners is not None:
+        # Refine corner positions for sub-pixel accuracy
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.0001)
+        corners_refined = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+        
+        objpoints.append(objp)
+        imgpoints.append(corners_refined)
+        print("✓ DETECTED")
+        successful += 1
+    else:
+        print("Not detected")
+        failed += 1
+
+print(f"\n{'='*70}")
+print(f"Detection Results: {successful} successful / {failed} failed")
+print(f"{'='*70}")
+
+if len(objpoints) < 3:
+    print(f"\n  CALIBRATION FAILED")
+    print(f"   Need: 3+ images with detected checkerboard")
+    print(f"   Have: {len(objpoints)} images")
+else:
+    ret, camera_matrix, dist_coeffs, rvecs, tvecs = cv2.calibrateCamera(
+        objpoints, imgpoints, gray.shape[::-1], None, None
+    )
+
+    print(f"\n✓ CALIBRATION SUCCESSFUL")
+    print(f"   Reprojection error: {ret:.4f}")
+    print(f"\n   Camera matrix:")
+    for row in camera_matrix:
+        print(f"   {row}")
+    print(f"\n   Distortion coefficients:")
+    print(f"   {dist_coeffs.flatten()}")
+
+    fx = camera_matrix[0, 0]
+    fy = camera_matrix[1, 1]
+    cx = camera_matrix[0, 2]
+    cy = camera_matrix[1, 2]
+
+    print(f"\n{'='*70}")
+    print(f"Calibration Results:")
+    print(f"{'='*70}")
+    print(f"   fx (focal length X): {fx:.2f} pixels")
+    print(f"   fy (focal length Y): {fy:.2f} pixels")
+    print(f"   Principal point:     ({cx:.2f}, {cy:.2f})")
+    print(f"{'='*70}")
+###############################################################
+Camera parameters
+
 CHECKERBOARD = (9, 6)      # inner corners, do not change
 SQUARE_SIZE = 2.5
 BASELINE = 6.0  # Distance between camera lenses in cm
@@ -46,3 +149,198 @@ FOCAL_LENGTH = 0.0 # Focal length in pixels, calculated above
 
 OBJECT_REAL_WIDTH = 13.0  # Real width of object in cm
 OBJECT_REAL_HEIGHT = 20.0  # Real height of object in cm
+
+
+###############################################################
+
+Disparity from clicking two images 
+
+
+img_left = cv2.imread("Images/left_book.jpg")
+img_right = cv2.imread("Images/right_book.jpg")
+
+# Camera calibration parameters
+distortion_coeffs = np.array([[ 0.288829927, -1.85731708, -0.000870417653, -0.000528261999, 3.49679774]])
+
+camera_matrix = np.array([[4439.16885, 0.0, 2144.15454],
+                           [0.0, 4438.67388, 2853.12508],
+                           [0.0, 0.0, 1.0]])
+# Undistort images
+img_left_undistorted = cv2.undistort(img_left, camera_matrix, distortion_coeffs)
+img_right_undistorted = cv2.undistort(img_right, camera_matrix, distortion_coeffs)
+
+measurements = {'left': None, 'right': None}
+
+def click_event(event, x, y, flags, param):
+    if event == cv2.EVENT_LBUTTONDOWN:
+        image_side = param  # param contains "left" or "right"
+        measurements[image_side] = (x, y)
+        print(f"{image_side.upper()} image clicked at (x={x}, y={y})")
+
+# Show images to measure pixel coordinates
+cv2.namedWindow("Left Undistorted", cv2.WINDOW_NORMAL)
+cv2.setMouseCallback("Left Undistorted", click_event, param="left")
+cv2.imshow("Left Undistorted", img_left_undistorted)
+
+cv2.namedWindow("Right Undistorted", cv2.WINDOW_NORMAL)
+cv2.setMouseCallback("Right Undistorted", click_event, param="right")
+cv2.imshow("Right Undistorted", img_right_undistorted)
+
+print("Click on matching points in both images to measure disparity.")
+print("Press ESC or Q to finish. Close windows to exit.")
+
+# Wait for user input with timeout
+while True:
+    key = cv2.waitKey(100) & 0xFF
+    
+    # ESC or 'q' key
+    if key == 27 or key == ord('q'):
+        print("Exiting...")
+        break
+    
+    # Check if both windows are still open
+    left_open = cv2.getWindowProperty("Left Undistorted", cv2.WND_PROP_VISIBLE) > 0
+    right_open = cv2.getWindowProperty("Right Undistorted", cv2.WND_PROP_VISIBLE) > 0
+    
+    # Exit if either window is closed
+    if not left_open or not right_open:
+        print("Windows closed")
+        break
+
+cv2.destroyAllWindows()
+
+# Use measurements if clicked, otherwise use defaults
+if measurements['left'] and measurements['right']:
+    x_left, y_left = measurements['left']
+    x_right, y_right = measurements['right']
+    disparity = x_left - x_right
+    print(f"\nMeasured Points:")
+    print(f"Left image: ({x_left}, {y_left})")
+    print(f"Right image: ({x_right}, {y_right})")
+    print(f"Disparity: {disparity} px")
+else:
+    # Example measurements (REPLACE WITH YOUR ACTUAL MEASUREMENTS):
+    print("\nNo clicks detected, using example measurements:")
+    x_left = 350   # x-coordinate in left image
+    x_right = 300  # x-coordinate in right image
+    disparity = x_left - x_right
+    print(f"Left image x-coordinate: {x_left} px")
+    print(f"Right image x-coordinate: {x_right} px")
+    print(f"Disparity: {disparity} px")
+###############################################################
+
+depth calculation using disparity
+
+def calculate_depth(baseline, focal_length, disparity):
+    """
+    Calculate depth using stereo triangulation.
+    
+    Args:
+        baseline: Distance between cameras (cm)
+        focal_length: Camera focal length (pixels)
+        disparity: Pixel difference between images (pixels)
+    
+    Returns:
+        depth: Distance to object (cm)
+    """
+    if disparity == 0:
+        return float('inf')  # Avoid division by zero
+    
+    depth = (baseline * focal_length) / disparity
+    return depth
+###############################################################
+Plot image with grid to measure pixel width of object
+
+img_left = cv2.imread('Images/left_book.jpg')
+
+distortion_coeffs = np.array([[ 0.288829927, -1.85731708, -0.000870417653, -0.000528261999, 3.49679774]])
+camera_matrix = np.array([[4439.16885, 0.0, 2144.15454],
+                           [0.0, 4438.67388, 2853.12508],
+                           [0.0, 0.0, 1.0]])
+
+img_left_undist = cv2.undistort(img_left, camera_matrix, distortion_coeffs)
+img_left_rgb = cv2.cvtColor(img_left_undist, cv2.COLOR_BGR2RGB)
+
+fig, ax = plt.subplots(figsize=(18, 10))
+ax.imshow(img_left_rgb)
+
+# Fine-grained grid with every 50 pixels
+ax.set_xticks(range(0, img_left_rgb.shape[1], 250), minor=False)
+ax.set_yticks(range(0, img_left_rgb.shape[0], 250), minor=False)
+
+ax.grid(which='major', color='white', linewidth=1, alpha=0.5)
+ax.grid(which='minor', color='white', linewidth=0.3, alpha=0.2)
+
+ax.set_title('Image with Fine-Grained Grid\nRead x-coordinates from BOTTOM axis to measure book width', 
+             fontsize=14, fontweight='bold')
+ax.set_xlabel('X coordinate (pixels)', fontsize=12, fontweight='bold')
+ax.set_ylabel('Y coordinate (pixels)', fontsize=12, fontweight='bold')
+
+plt.tight_layout()
+plt.show()
+
+###############################################################
+depth calculation using known object size
+
+def calculate_depth_from_size(real_width, focal_length, pixel_width):
+    """
+    Calculate depth using known object size.
+    
+    Args:
+        real_width: Actual width of object (cm)
+        focal_length: Camera focal length (pixels)
+        pixel_width: Object width in image (pixels)
+    
+    Returns:
+        depth: Distance to object (cm)
+    """
+    # YOUR CODE HERE
+    if pixel_width == 0:
+        return float('inf')  # avoid division by zero
+    
+    depth = (real_width * focal_length) / pixel_width
+    return depth
+
+depth_from_size = calculate_depth_from_size(OBJECT_REAL_WIDTH, FOCAL_LENGTH, object_pixel_width)
+
+###############################################################
+
+1. Measurement Precision
+
+Manual pixel measurements are inherently limited by human error and image resolution.
+
+Small errors of even 1–2 pixels can result in significant depth errors, especially for objects far away.
+
+Accuracy improves with higher-resolution images and careful point selection, but manual methods are always less precise than automated feature matching or stereo algorithms.
+
+2. Disparity and Distance
+
+Disparity decreases as objects get further away from the cameras because the projection difference between left and right images becomes smaller.
+
+Smaller disparity values are harder to measure accurately, which reduces depth precision for distant objects.
+
+Conversely, closer objects have larger disparity and can be measured more accurately.
+
+3. Baseline Trade-off
+
+The baseline is the distance between the stereo cameras:
+
+Depth accuracy → A larger baseline increases sensitivity to disparity, improving depth accuracy for a given object.
+
+Maximum measurable distance → Larger baselines allow accurate measurement of farther objects (larger disparity signal).
+
+Minimum measurable distance → Too large a baseline can cause disparity to exceed image bounds for very close objects, making them unmeasurable.
+
+Summary: Increasing baseline improves long-range depth precision but can create problems with very close objects.
+
+4. Real-World Challenges in Underwater ROV Applications
+
+Poor visibility due to turbidity, particles, or low light, which makes feature detection difficult.
+
+Refraction through water and housings alters apparent positions, introducing calibration errors.
+
+Limited camera resolution underwater, especially in low light.
+
+Dynamic scenes (moving objects or currents) make manual point selection unreliable.
+
+Lens distortion can vary over time, requiring recalibration.
